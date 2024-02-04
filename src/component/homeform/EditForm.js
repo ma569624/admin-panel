@@ -1,59 +1,73 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Col, Container, Form, Row, Button } from 'react-bootstrap'
 import ApiCalls from '../../ApiCalls/ApiCalls'
-import { useNavigate } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 
-
-const From = () => {
+const EditForm = () => {
+    // const inputfile = useRef(null);
+    const [image, setimage] = useState(null)
     const [inputs, setInputs] = useState({})
-    const navigate = useNavigate()
+    const params = useParams()
+    const { id } = params;
+    useEffect(() => {
+        getdata()
+    }, [id])
 
+    const getdata = () => {
+
+        ApiCalls(`home/banner?_id=${id}`).then((res) => {
+            const data = res[0];
+            setInputs(data);
+        })
+            .catch((err) => {
+
+            })
+
+    }
+    // console.warn(inputs)
+    // const [inputs, setInputs] = useState({})
 
     async function FormSubmit(event) {
-
         event.preventDefault();
-
-        console.log(inputs.file)
+        console.log(inputs)
+        console.log(image)
 
         const formData = await new FormData();
         formData.append('heading', inputs.heading);
         formData.append('subheading', inputs.subheading);
         formData.append('shortdesc', inputs.shortdesc);
-        formData.append('file', inputs.file);
+        formData.append('file', image);
 
-        console.log(formData)
 
-        // let result = await fetch('http://localhost:5000/api/home/banner', {
-        //     method: 'POST',
-        //     body: formData,
-        // });
-        // alert("data has set", result);
 
-        let newres = await ApiCalls('home/banner', 'POST', formData).then(() => {
-            alert("data add successfully")
-            navigate('/');
+        ApiCalls(`home/banner/${id}`, 'PUT', formData).then(() => {
+            alert("data updata successfully")
         })
+            .catch((err) => {
 
+            })
 
     }
 
     const handleChange = (event) => {
+
         const name = event.target.name;
         const value = event.target.value;
         setInputs({ ...inputs, [name]: value })
+
     }
 
     const imagehandler = (event) => {
         const value = event.target.files[0];
-        const name = event.target.name;
-        setInputs({ ...inputs, [name]: value })
+        // const name = event.target.name;
+        setimage(value);
     }
 
     return (
         <Container>
             <Row>
                 <Col lg='12'>
-                    <h4>Add Banner</h4>
+                    <h4>Edit Banner</h4>
                     <Form onSubmit={() => FormSubmit} action="/post" method="POST" encType="multipart/form-data">
 
                         <Form.Group className="mb-3">
@@ -68,10 +82,16 @@ const From = () => {
                             <Form.Label>Paragraph</Form.Label>
                             <Form.Control type="text" placeholder="Short desc" value={inputs.shortdesc || ""} onChange={handleChange} name='shortdesc' />
                         </Form.Group>
-                        <Form.Group className="mb-3">
+
+                        <Form.Group className="mb-3" >
                             <Form.Label>Banner Image</Form.Label>
-                            <Form.Control type="file" placeholder="Short desc" onChange={imagehandler} name="file" />
-                            {/* <Form.Control type="file" ref={fileInputRef} onChange={imagehandler} name='banner' /> */}
+
+                            <Form.Control type="file" onChange={imagehandler} name="file" />
+                            {
+                                image !== null ? <img src={URL.createObjectURL(image)} alt="upload image" className="img-display-after" />
+                                    : <img src={inputs.banner} alt="upload" className="img-display-before" />
+                            }
+
                         </Form.Group>
 
                         <Button type="submit" onClick={FormSubmit}>Submit</Button>
@@ -82,4 +102,4 @@ const From = () => {
     )
 }
 
-export default From
+export default EditForm

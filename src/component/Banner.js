@@ -33,7 +33,7 @@ const Banner = () => {
     return (
         <>
             <h4>Banners</h4>
-            <Link to={'/form/addbanner'}><Button variant='primary' className='my-3'>Add New</Button></Link>
+            <Link to={'/form'}><Button variant='primary' className='my-3'>Add New</Button></Link>
             <Table>
                 <thead>
                     <tr>
@@ -52,7 +52,7 @@ const Banner = () => {
                                 <td>{key + 1}</td>
                                 <td>{item.heading}</td>
                                 <td>{item.subheading}</td>
-                                <td><img src={item.imgurl} alt="pic" /></td>
+                                <td><img src={item.banner} alt="pic" /></td>
                                 <td>{item.shortdesc}</td>
                                 <td>
                                     <Stack direction='horizontal' gap={2}>
